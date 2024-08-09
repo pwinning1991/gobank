@@ -38,11 +38,10 @@ func NewApiServer(listenAddr string) *APIServer {
 
 func (s *APIServer) Run() {
 	router := mux.NewRouter()
-
-	log.Println("JSON Api server Listening on " + s.listenAddr)
-	http.ListenAndServe(s.listenAddr, router)
-
 	router.HandleFunc("/account", makeHTTPHandleFunc(s.handleAccount))
+	log.Println("JSON Api server Listening on " + s.listenAddr)
+	log.Fatal(http.ListenAndServe(s.listenAddr, router))
+
 }
 
 func (s *APIServer) handleAccount(w http.ResponseWriter, r *http.Request) error {
@@ -59,7 +58,8 @@ func (s *APIServer) handleAccount(w http.ResponseWriter, r *http.Request) error 
 }
 
 func (s *APIServer) handleGetAccount(w http.ResponseWriter, r *http.Request) error {
-	return nil
+	account := NewAccount("Phil", "w")
+	return WriteJson(w, http.StatusOK, account)
 }
 
 func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) error {
