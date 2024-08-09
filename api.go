@@ -10,30 +10,13 @@ import (
 
 type APIServer struct {
 	listenAddr string
+	store      Storage
 }
 
-func WriteJson(w http.ResponseWriter, status int, v any) error {
-	w.WriteHeader(status)
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	return json.NewEncoder(w).Encode(v)
-}
-
-type apiFunc func(w http.ResponseWriter, r *http.Request) error
-
-type ApiError struct {
-	Error string
-}
-
-func makeHTTPHandleFunc(f apiFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if err := f(w, r); err != nil {
-			WriteJson(w, http.StatusBadRequest, ApiError{err.Error()})
-		}
+func NewApiServer(listenAddr string, store Storage) *APIServer {
+	return &APIServer{listenAddr: listenAddr,
+		store: store,
 	}
-}
-
-func NewApiServer(listenAddr string) *APIServer {
-	return &APIServer{listenAddr: listenAddr}
 }
 
 func (s *APIServer) Run() {
@@ -72,4 +55,24 @@ func (s *APIServer) handleDeleteAccount(w http.ResponseWriter, r *http.Request) 
 
 func (s *APIServer) handleTransfer(w http.ResponseWriter, r *http.Request) error {
 	return nil
+}
+
+func WriteJson(w http.ResponseWriter, status int, v any) error {
+	w.WriteHeader(status)
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	return json.NewEncoder(w).Encode(v)
+}
+
+type apiFunc func(w http.ResponseWriter, r *http.Request) error
+
+type ApiError struct {
+	Error string
+}
+
+func makeHTTPHandleFunc(f apiFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if err := f(w, r); err != nil {
+			WriteJson(w, http.StatusBadRequest, ApiError{err.Error()})
+		}
+	}
 }
