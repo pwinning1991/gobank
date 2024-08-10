@@ -11,6 +11,7 @@ type Storage interface {
 	DeleteAccount(*Account) error
 	UpdateAccount(*Account) error
 	GetAccountByID(int) (*Account, error)
+	GetAccounts() ([]*Account, error)
 }
 
 type PostgresStore struct {
@@ -38,7 +39,7 @@ func (s *PostgresStore) createAccountTable() error {
 		id serial PRIMARY KEY,
 		firstname varchar(50),
 		lastname varchar(50),
-		nunber serial,
+		number serial,
 		balance serial,
 		created_at timestamp
 )`
@@ -76,4 +77,30 @@ func (s *PostgresStore) UpdateAccount(account *Account) error {
 
 func (s *PostgresStore) GetAccountByID(id int) (*Account, error) {
 	return nil, nil
+}
+
+func (s *PostgresStore) GetAccounts() ([]*Account, error) {
+	sqlStatement := `select id, firstName, lastName, number, balance, created_at from account`
+	rows, err := s.db.Query(sqlStatement)
+	if err != nil {
+		return nil, err
+	}
+	accounts := make([]*Account, 0)
+	for rows.Next() {
+		account := &Account{}
+		err := rows.Scan(
+			&account.ID,
+			&account.FirstName,
+			&account.LastName,
+			&account.Number,
+			&account.Balance,
+			&account.CreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		accounts = append(accounts, account)
+
+	}
+	return accounts, nil
 }
