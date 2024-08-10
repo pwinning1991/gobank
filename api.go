@@ -48,11 +48,11 @@ func (s *APIServer) handleGetAccount(w http.ResponseWriter, r *http.Request) err
 }
 
 func (s *APIServer) handleGetAccountByID(w http.ResponseWriter, r *http.Request) error {
-	id, err := getID(r)
-	if err != nil {
-		return err
-	}
 	if r.Method == http.MethodGet {
+		id, err := getID(r)
+		if err != nil {
+			return err
+		}
 		account, err := s.store.GetAccountByID(id)
 		if err != nil {
 			return err
@@ -61,10 +61,8 @@ func (s *APIServer) handleGetAccountByID(w http.ResponseWriter, r *http.Request)
 	}
 
 	if r.Method == http.MethodDelete {
-		err := s.handleDeleteAccount(w, r)
-		if err != nil {
-			return err
-		}
+		return s.handleDeleteAccount(w, r)
+
 	}
 
 	return fmt.Errorf("Unsupported method: %s", r.Method)
