@@ -34,9 +34,9 @@ func (s *PostgresStore) Init() error {
 
 func (s *PostgresStore) createAccountTable() error {
 	query := `create table if not exists account(
-		id serial PRIMARY KEY AUTOINCREMENT,
-		firstname varchar(255) NOT NULL DEFAULT,
-		lastname varchar(255) NOT NULL DEFAULT,
+		id serial PRIMARY KEY,
+		firstname varchar(50),
+		lastname varchar(50),
 		nunber serial,
 		balance serial,
 		created_at timestamp
