@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/lib/pq"
 )
 
@@ -47,6 +48,21 @@ func (s *PostgresStore) createAccountTable() error {
 }
 
 func (s *PostgresStore) CreateAccount(account *Account) error {
+	sqlStatement := `insert into account
+	(firstName, lastName, number, balance, created_at)
+	values ($1, $2, $3, $4, $5)`
+
+	resp, err := s.db.Exec(sqlStatement,
+		account.FirstName,
+		account.LastName,
+		account.Number,
+		account.Balance,
+		account.CreatedAt)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("CreateAccount %v\n", resp)
+
 	return nil
 }
 
