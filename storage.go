@@ -82,7 +82,6 @@ func (s *PostgresStore) GetAccountByID(id int) (*Account, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	account := &Account{}
 	for rows.Next() {
 		return scanIntoAccount(rows)
 	}
