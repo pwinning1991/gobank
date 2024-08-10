@@ -76,7 +76,7 @@ func (s *PostgresStore) UpdateAccount(account *Account) error {
 }
 
 func (s *PostgresStore) GetAccountByID(id int) (*Account, error) {
-	sqlStatement := `select from account where id = $1`
+	sqlStatement := `select * from account where id = $1`
 	rows, err := s.db.Query(sqlStatement, id)
 	if err != nil {
 		return nil, err
