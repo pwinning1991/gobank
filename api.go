@@ -79,6 +79,12 @@ func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) 
 	if err := s.store.CreateAccount(account); err != nil {
 		return err
 	}
+
+	tokenString, err := createJWT(account)
+	if err != nil {
+		return err
+	}
+	fmt.Fprintf(w, tokenString)
 	return WriteJson(w, http.StatusOK, account)
 }
 
@@ -102,6 +108,21 @@ func (s *APIServer) handleTransfer(w http.ResponseWriter, r *http.Request) error
 	defer r.Body.Close()
 
 	return WriteJson(w, http.StatusOK, transferReq)
+}
+
+func createJWT(account *Account) (string, error) {
+	claims := &jwt.MapClaims{
+		"ExpiresAt":     15000,
+		"accountNumber": account.Number,
+	}
+
+	secrect := os.Getenv("JWT_SECRET")
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString([]byte(secrect))
+	if err != nil {
+		return "", err
+	}
+	return tokenString, nil
 }
 
 func withJWTAith(handlerFunc http.HandlerFunc) http.HandlerFunc {
