@@ -76,7 +76,26 @@ func (s *PostgresStore) UpdateAccount(account *Account) error {
 }
 
 func (s *PostgresStore) GetAccountByID(id int) (*Account, error) {
-	return nil, nil
+	sqlStatement := `select from account where id = $1`
+	rows, err := s.db.Query(sqlStatement, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	account := &Account{}
+	for rows.Next() {
+		err := rows.Scan(
+			&account.ID,
+			&account.FirstName,
+			&account.LastName,
+			&account.Number,
+			&account.Balance,
+			&account.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return account, nil
 }
 
 func (s *PostgresStore) GetAccounts() ([]*Account, error) {
