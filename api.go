@@ -36,9 +36,6 @@ func (s *APIServer) handleAccount(w http.ResponseWriter, r *http.Request) error 
 	if r.Method == http.MethodPost {
 		return s.handleCreateAccount(w, r)
 	}
-	if r.Method == http.MethodDelete {
-		return s.handleDeleteAccount(w, r)
-	}
 	return fmt.Errorf("Unsupported method: %s", r.Method)
 }
 
@@ -55,11 +52,22 @@ func (s *APIServer) handleGetAccountByID(w http.ResponseWriter, r *http.Request)
 	if err != nil {
 		return err
 	}
-	account, err := s.store.GetAccountByID(id)
-	if err != nil {
-		return err
+	if r.Method == http.MethodGet {
+		account, err := s.store.GetAccountByID(id)
+		if err != nil {
+			return err
+		}
+		return WriteJson(w, http.StatusOK, account)
 	}
-	return WriteJson(w, http.StatusOK, account)
+
+	if r.Method == http.MethodDelete {
+		err := s.handleDeleteAccount(w, r)
+		if err != nil {
+			return err
+		}
+	}
+
+	return fmt.Errorf("Unsupported method: %s", r.Method)
 }
 
 func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) error {
