@@ -8,7 +8,7 @@ import (
 
 type Storage interface {
 	CreateAccount(*Account) error
-	DeleteAccount(*Account) error
+	DeleteAccount(int) error
 	UpdateAccount(*Account) error
 	GetAccountByID(int) (*Account, error)
 	GetAccounts() ([]*Account, error)
@@ -67,7 +67,12 @@ func (s *PostgresStore) CreateAccount(account *Account) error {
 	return nil
 }
 
-func (s *PostgresStore) DeleteAccount(account *Account) error {
+func (s *PostgresStore) DeleteAccount(id int) error {
+	sqlStatement := `delete from account where id = $1`
+	_, err := s.db.Exec(sqlStatement, id)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
