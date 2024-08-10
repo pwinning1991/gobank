@@ -6,7 +6,7 @@ import (
 )
 
 type TransferRequest struct {
-	ToAccount int `json:"to_account"`
+	ToAccount int `json:"toAccount"`
 	Amount    int `json:"amount"`
 }
 
